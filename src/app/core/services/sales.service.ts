@@ -1,0 +1,140 @@
+import {computed, inject, Injectable} from '@angular/core';
+import {DashboardFilterService} from './dashboard-filter.service';
+import salesData from '../../../../public/assets/data/sales-data.json'
+import {ChartDataset} from 'chart.js';
+import {ThemeService} from './theme.service';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class SalesService {
+  #filtersService = inject(DashboardFilterService);
+  #themeService = inject(ThemeService);
+
+  #filteredDailySales = computed(() => {
+    const range = this.#filtersService.dateRange();
+    const category = this.#filtersService.category();
+    const region = this.#filtersService.region();
+
+    if (range === 'year') return [];
+
+    const days = range === 'week' ? 7 : 30;
+    const lastNDays = salesData.dailySales.slice(-days);
+
+    return lastNDays.map(d => {
+      const matches =
+        (category === 'All' || d.category === category) &&
+        (region === 'All' || d.region === region);
+
+      return matches ? d : { ...d, amount: 0 };
+    });
+  });
+
+  lineChartData = computed(() => {
+    const range = this.#filtersService.dateRange();
+    const chartColors = this.#themeService.currentTheme().chartColors;
+
+    if (range === 'year') {
+      return {
+        labels: salesData.monthlySales.map(s => s.month),
+        datasets: [
+          {
+            label: 'Actual Sales',
+            data: salesData.monthlySales.map(s => s.amount),
+            borderColor: chartColors[0],
+            backgroundColor: chartColors[0] + '1A',
+            tension: 0.4,
+            fill: true,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+          } as ChartDataset<'line'>,
+          {
+            label: 'Target',
+            data: salesData.monthlySales.map(s => s.target),
+            borderColor: chartColors[1],
+            backgroundColor: 'transparent',
+            tension: 0.4,
+            borderDash: [5, 5],
+            fill: false,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          } as ChartDataset<'line'>,
+        ],
+      };
+    }
+
+    const sales = this.#filteredDailySales();
+    return {
+      labels: sales.map(d => d.date),
+      datasets: [
+        {
+          label: 'Daily Sales',
+          data: sales.map(d => d.amount),
+          borderColor: chartColors[0],
+          backgroundColor: chartColors[0] + '1A',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        } as ChartDataset<'line'>,
+      ],
+    };
+  });
+
+  barChartData = computed(() => {
+    const chartColors = this.#themeService.currentTheme().chartColors;
+    const regions = salesData.regionalSales;
+
+    return {
+      labels: regions.map(r => r.region),
+      datasets: [
+        {
+          data: regions.map(r => r.sales),
+          backgroundColor: regions.map((_, i) => chartColors[i] + '99'),
+          borderColor: regions.map((_, i) => chartColors[i]),
+          borderWidth: 2,
+          borderRadius: 6,
+        } as ChartDataset<'bar'>,
+      ],
+    };
+  });
+
+  growthChartData = computed(() => {
+    const theme = this.#themeService.currentTheme();
+    const regions = salesData.regionalSales;
+
+    return {
+      labels: regions.map(r => r.region),
+      datasets: [
+        {
+          data: regions.map(r => r.growth),
+          backgroundColor: regions.map(r =>
+            r.growth >= 0 ? theme.successColor + '99' : theme.dangerColor + '99'
+          ),
+          borderColor: regions.map(r =>
+            r.growth >= 0 ? theme.successColor : theme.dangerColor
+          ),
+          borderWidth: 2,
+          borderRadius: 6,
+        } as ChartDataset<'bar'>,
+      ],
+    };
+  });
+
+  pieChartData = computed(() => {
+    const chartColors = this.#themeService.currentTheme().chartColors;
+    const categories = salesData.categoryBreakdown;
+
+    return {
+      labels: categories.map(c => c.category),
+      datasets: [
+        {
+          data: categories.map(c => c.value),
+          backgroundColor: categories.map((_, i) => chartColors[i] + 'CC'),
+          borderColor: categories.map((_, i) => chartColors[i]),
+          borderWidth: 2,
+        } as ChartDataset<'pie'>,
+      ],
+    };
+  });
+}

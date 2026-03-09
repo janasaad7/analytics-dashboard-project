@@ -1,0 +1,21 @@
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.card {
+  background-color: var(--card-background);
+}
+
+button.primary {
+  background-color: var(--primary-color);
+}
+
+button.secondary {
+  background-color: var(--secondary-color);
+}

@@ -1,0 +1,35 @@
+<app-widget-wrapper
+  customClasses="flex flex-col gap-2 w-250 h-110 min-w-150 min-h-80 max-w-360 max-h-300"
+  title="Users"
+  (dismiss)="removeTable.emit()"
+>
+  <input
+    type="text"
+    placeholder="Search by name or email..."
+    class="border rounded px-3 py-3 text-sm w-full"
+    [style.borderColor]="'var(--grid-color)'"
+    [style.background-color]="'var(--background-color)'"
+    (input)="searchQuery.set($any($event.target).value)"
+  />
+
+  <div class="flex-1 min-h-0">
+    @defer (on idle) {
+      <ag-grid-angular
+        class="w-full h-full"
+        [rowData]="rowData()"
+        [columnDefs]="colDefs"
+        [defaultColDef]="defaultColDef"
+        [initialState]="{ sort: { sortModel: initialSortState } }"
+        [theme]="gridTheme()"
+        [pagination]="true"
+        [paginationPageSize]="5"
+        [paginationPageSizeSelector]="[5, 10, 25]"
+        [suppressHorizontalScroll]="true"
+      />
+    } @placeholder {
+      <div class="flex items-center justify-center h-full text-sm opacity-50">
+        Loading table...
+      </div>
+    }
+  </div>
+</app-widget-wrapper>

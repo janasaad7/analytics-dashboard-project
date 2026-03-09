@@ -1,0 +1,13 @@
+@reference "../../../../styles.scss";
+
+.stat-card{
+
+  &__trend{
+    &--up{
+      @apply text-green-500;
+    }
+    &--down{
+      @apply text-red-700;
+    }
+  }
+}

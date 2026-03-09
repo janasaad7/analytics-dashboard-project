@@ -1,0 +1,9 @@
+<div class="flex flex-wrap gap-4">
+  @for(stat of visibleStats(); track stat.id){
+    <app-stat-card
+      [stat]="stat"
+      (removeCard)="hideStatCard($event)"
+    ></app-stat-card>
+  }
+</div>
+

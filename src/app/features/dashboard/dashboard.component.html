@@ -1,0 +1,209 @@
+<header class="flex items-center justify-between flex-wrap gap-4 px-6 py-4 bg-[var(--card-background)] border-b border-[var(--grid-color)] sticky top-0 z-50">
+  <h1 class="text-xl font-bold text-[var(--text-color)]">Analytics Dashboard</h1>
+
+  <div class="flex items-center flex-wrap gap-4">
+    <div class="flex flex-col gap-1">
+      <label class="text-xs uppercase tracking-widest text-[var(--text-color)] opacity-50 font-semibold">Period</label>
+      <select
+        class="bg-[var(--background-color)] text-[var(--text-color)] border border-[var(--grid-color)] rounded-md px-2 py-1 text-sm cursor-pointer"
+        [value]="dateRange()" (change)="changeDateRange($any($event.target).value)"
+      >
+        <option value="week">Last Week</option>
+        <option value="month">Last Month</option>
+        <option value="year">Last Year</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs uppercase tracking-widest text-[var(--text-color)] opacity-50 font-semibold">Category</label>
+      <select
+        class="bg-[var(--background-color)] text-[var(--text-color)] border border-[var(--grid-color)] rounded-md px-2 py-1 text-sm cursor-pointer"
+        [value]="category()" (change)="changeCategory($any($event.target).value)"
+      >
+        <option value="All">All</option>
+        <option value="Electronics">Electronics</option>
+        <option value="Clothing">Clothing</option>
+        <option value="Food">Food</option>
+        <option value="Books">Books</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs uppercase tracking-widest text-[var(--text-color)] opacity-50 font-semibold">Region</label>
+      <select
+        class="bg-[var(--background-color)] text-[var(--text-color)] border border-[var(--grid-color)] rounded-md px-2 py-1 text-sm cursor-pointer"
+        [value]="region()" (change)="changeRegion($any($event.target).value)"
+      >
+        <option value="All">All</option>
+        <option value="North">North</option>
+        <option value="South">South</option>
+        <option value="East">East</option>
+        <option value="West">West</option>
+      </select>
+    </div>
+
+    <div class="w-px h-8 bg-[var(--grid-color)]"></div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs uppercase tracking-widest text-[var(--text-color)] opacity-50 font-semibold">Theme</label>
+      <select
+        class="bg-[var(--background-color)] text-[var(--text-color)] border border-[var(--grid-color)] rounded-md px-2 py-1 text-sm cursor-pointer"
+        [value]="currentTheme().name" (change)="changeTheme($any($event.target).value)"
+      >
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+
+    <div class="w-px h-8 bg-[var(--grid-color)]"></div>
+
+    <div class="flex flex-col gap-1">
+      <label class="text-xs uppercase tracking-widest text-[var(--text-color)] opacity-50 font-semibold">Role</label>
+      <select
+        class="bg-[var(--background-color)] text-[var(--text-color)] border border-[var(--grid-color)] rounded-md px-2 py-1 text-sm cursor-pointer"
+        [value]="currentRole()" (change)="changeRole($any($event.target).value)"
+      >
+        <option value="admin">Admin</option>
+        <option value="manager">Manager</option>
+        <option value="viewer">Viewer</option>
+      </select>
+    </div>
+
+    <div class="w-px h-8 bg-[var(--grid-color)]"></div>
+
+    <button
+      class="px-3 py-1.5 text-sm font-semibold rounded-md border border-[var(--grid-color)] bg-[var(--background-color)] text-[var(--text-color)] cursor-pointer hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-colors"
+      (click)="resetLayout()"
+    >
+      ↺ Reset
+    </button>
+
+    <button
+      class="px-3 py-1.5 text-sm font-semibold rounded-md border border-[var(--grid-color)] bg-[var(--background-color)] text-[var(--text-color)] cursor-pointer hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-colors"
+      (click)="saveLayout()"
+    >
+      💾 Save
+    </button>
+
+    <button
+      class="px-3 py-1.5 text-sm font-semibold rounded-md border border-[var(--grid-color)] bg-[var(--background-color)] text-[var(--text-color)] cursor-pointer hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-colors"
+      (click)="printLayout()"
+    >
+      🖨 Print
+    </button>
+
+    <div class="relative export-dropdown">
+      <button
+        class="px-3 py-1.5 text-sm font-semibold rounded-md border border-[var(--grid-color)] bg-[var(--background-color)] text-[var(--text-color)] cursor-pointer hover:border-[var(--primary-color)] hover:text-[var(--primary-color)] transition-colors"
+        (click)="isExportOpen.set(!isExportOpen())"
+      >
+        ⬇ Export
+      </button>
+
+      @if (isExportOpen()) {
+        <div class="flex flex-col absolute right-0 top-full mt-1 bg-[var(--card-background)] border border-[var(--grid-color)] rounded-md shadow-lg z-50 min-w-36 overflow-hidden">
+          <button class="px-4 py-2 text-sm text-left text-[var(--text-color)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
+                  (click)="exportPDF(); isExportOpen.set(false)">📄 PDF</button>
+          <button class="px-4 py-2 text-sm text-left text-[var(--text-color)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
+                  (click)="exportExcel(); isExportOpen.set(false)">📊 Excel</button>
+          <button class="px-4 py-2 text-sm text-left text-[var(--text-color)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
+                  (click)="exportCSV(); isExportOpen.set(false)">📋 CSV</button>
+        </div>
+      }
+    </div>
+
+    <div class="relative add-dropdown">
+      <button
+        class="px-3 py-1.5 text-sm font-semibold rounded-md border border-[var(--grid-color)] bg-[var(--background-color)] text-[var(--text-color)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+        [class.cursor-pointer]="removedWidgets().length > 0"
+        [disabled]="removedWidgets().length === 0"
+        (click)="isAddOpen.set(!isAddOpen())"
+      >
+        + Add Widget
+      </button>
+
+      @if (isAddOpen() && removedWidgets().length > 0) {
+        <div class="flex flex-col absolute right-0 top-full mt-1 bg-[var(--card-background)] border border-[var(--grid-color)] rounded-md shadow-lg z-50 min-w-48 overflow-hidden">
+          @for (widget of removedWidgets(); track widget.id) {
+            <button
+              class="px-4 py-2 text-sm text-left text-[var(--text-color)] hover:bg-[var(--primary-color)] hover:text-white transition-colors cursor-pointer"
+              (click)="addWidget(widget); isAddOpen.set(false)"
+            >
+              {{ widget.label }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</header>
+
+<main class="p-6 bg-[var(--background-color)] min-h-screen">
+  <div class="flex flex-wrap gap-4">
+    @for (widget of activeWidgets(); track widget.id) {
+      @if (widget.type === 'line-chart') {
+        <div
+          *appRoleAccess="widget.allowedRoles"
+          [appDraggable]="currentRole() === 'admin'"
+          [appDraggableId]="widget.id"
+        >
+          <app-line-chart
+            (removeLineChart)="removeWidget(widget.id)"
+          />
+        </div>
+      }
+
+      @if (widget.type === 'stat-card') {
+        <app-stats-grid *appRoleAccess="widget.allowedRoles" />
+      }
+
+      @if (widget.type === 'bar-chart') {
+        <div
+          *appRoleAccess="widget.allowedRoles"
+          [appDraggable]="currentRole() === 'admin'"
+          [appDraggableId]="widget.id"
+        >
+          <app-bar-chart
+            [title]="widget.label"
+            [horizontal]="widget.config?.horizontal ?? false"
+            [chartData]="widget.id === 'bar-sales-region'
+              ? salesService.barChartData()
+              : salesService.growthChartData()"
+            (removeBarChart)="removeWidget(widget.id)"
+          />
+        </div>
+      }
+
+      @if (widget.type === 'pie-chart') {
+        <div
+          *appRoleAccess="widget.allowedRoles"
+          [appDraggable]="currentRole() === 'admin'"
+          [appDraggableId]="widget.id"
+        >
+          <app-pie-chart
+            title="Sales by Category"
+            [chartData]="salesService.pieChartData()"
+            (removePieChart)="removeWidget(widget.id)"
+          />
+        </div>
+      }
+
+      @if (widget.type === 'kpi-gauge') {
+        <app-kpis-grid *appRoleAccess="widget.allowedRoles" />
+      }
+
+      @if (widget.type === 'data-table') {
+        <div
+          *appRoleAccess="widget.allowedRoles"
+          [appDraggable]="currentRole() === 'admin'"
+          [appDraggableId]="widget.id"
+        >
+          <app-data-table
+            (removeTable)="removeWidget(widget.id)"
+          />
+        </div>
+      }
+    }
+  </div>
+</main>

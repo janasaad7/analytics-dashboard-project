@@ -1,0 +1,33 @@
+<app-widget-wrapper
+  customClasses="flex flex-row justify-between gap-1 items-center w-50 h-25 min-w-[180px] min-h-[80px] max-w-[500px] max-h-[300px]"
+  (dismiss)="dismissStat()"
+  *appRoleAccess="stat().requiredRoles"
+  [appDraggable]="currentRole() === 'admin'"
+  [appDraggableId]="stat().id"
+>
+  <div class="stat-card__left-panel overflow-hidden">
+    <div class="stat-card__title text-sm uppercase text-gray-500 truncate">{{ stat().title }}</div>
+    <div class="stat-card__content text-lg font-bold truncate">
+      @if(stat().currency) {
+        <span>{{ stat().value | currency: stat().currency:'symbol':'1.0-0' }}</span>
+      } @else{
+        <span>{{ stat().value }}</span>
+      }
+    </div>
+    <div class="stat-card__trend text-sm font-bold flex flex-row gap-0 items-center justify-start truncate" [class.stat-card__trend--up]="isTrendPositive()" [class.stat-card__trend--down]="!isTrendPositive()">
+      @if(isTrendPositive()){
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4"/>
+        </svg>
+      } @else{
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 14-4-4m4 4 4-4"/>
+        </svg>
+      }
+      {{ stat().change }}{{ stat().suffix }}
+    </div>
+  </div>
+  <div class="stat-card__right-panel bg-blue-900/20 rounded-3xl">
+    <div class="stat-card__icon text-2xl p-1">{{ stat().icon }}</div>
+  </div>
+</app-widget-wrapper>

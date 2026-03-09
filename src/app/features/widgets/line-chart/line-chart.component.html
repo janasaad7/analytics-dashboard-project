@@ -1,0 +1,24 @@
+<app-widget-wrapper
+  customClasses="flex flex-col w-200 h-100 min-w-100 min-h-50 max-w-350 max-h-300"
+  (dismiss)="removeLineChart.emit()"
+>
+  <h1 class="font-bold text-lg text-center">Sales Over Time</h1>
+
+  <div class="flex-1 relative min-h-0 min-w-0">
+    @defer (on idle) {
+      <canvas
+        baseChart
+        type="line"
+        class="absolute inset-0"
+        [datasets]="chartData().datasets"
+        [labels]="chartData().labels"
+        [options]="chartOptions()"
+      ></canvas>
+    } @placeholder {
+      <div class="flex items-center justify-center h-full text-sm opacity-50">
+        Loading chart...
+      </div>
+    }
+  </div>
+</app-widget-wrapper>
+
